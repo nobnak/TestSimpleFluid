@@ -6,9 +6,10 @@ public class Solver : MonoBehaviour {
     public const int SOLVER_ADVECT = 1;
 
     public const string PROP_FLUID_TEX = "_FluidTex";
+	public const string PROP_FLUID_TEX_STEP_SIZE = "_FluidTex_StepSize";
     public const string PROP_BOUNDARY_TEX = "_BoundaryTex";
     public const string PROP_FORCE_TEX = "_ForceTex";
-    public const string PROP_VISUAL_TEX = "_VisualTex";
+	public const string PROP_IMAGE_TEX = "_ImageTex";
     public const string PROP_DT = "_Dt";
     public const string PROP_K_VIS = "_KVis";
     public const string PROP_S = "_S";
@@ -20,13 +21,17 @@ public class Solver : MonoBehaviour {
     public Shader solverShader;
     public KeyCode forceKey = KeyCode.Space;
     public Texture2D forceTex;
+	public Texture2D imageTex;
+	public Collider viewCollider;
 
     public int width = 256;
     public int height = 256;
 
     public float k = 0.12f;
     public float vis = 1.8e-5f;
-    public Vector2 forcePower = new Vector2(0.1f, 0.1f);
+	public float forcePower = 1f;
+	public Vector2 forceDir = new Vector2(0f, 1f);
+	public float advectSpeed = 1f;
 
     public Material[] outputMats;
 
@@ -34,19 +39,38 @@ public class Solver : MonoBehaviour {
     Texture2D _boundaryTex;
     RenderTexture _fluidTex0;
     RenderTexture _fluidTex1;
+	RenderTexture _imageTex0;
+	RenderTexture _imageTex1;
     Material _solverMat;
     float _forceThrottle = 0f;
+	Vector2 _forceVector;
+	Vector2 _forceTexOffset = Vector2.zero;
+	Vector3 _mousePos;
 
 	void Start () {
         InitSolver();
 	}
 	void Update () {
-        _forceThrottle = (Input.GetKey(forceKey) ? 1f : 0f);
+		var mousePos = Input.mousePosition;
+		var dx = UpdateMousePos(mousePos);
+		var dt = Time.deltaTime;
+		_forceThrottle = 0f;
+
+		RaycastHit hit;
+		if (Input.GetMouseButton (0)
+				&& viewCollider.Raycast (Camera.main.ScreenPointToRay (mousePos), out hit, float.MaxValue)) {
+			_forceThrottle = 1f;
+			_forceVector = forcePower * Vector2.ClampMagnitude ((Vector2)dx, 1f);
+			_forceTexOffset = -hit.textureCoord + new Vector2 (0.5f, 0.5f);
+		}
+
+		UpdateImage(dt * advectSpeed);
+		NotifyResult(_imageTex0);
+		//NotifyResult(_fluidTex0);
 	}
     void FixedUpdate() {
-        UpdateSolver(Time.fixedDeltaTime);
-        NotifyResult();
-    }
+		UpdateSolver(Time.fixedDeltaTime);
+	}
     void OnDestroy() {
         ReleaseSolver();
     }
@@ -57,6 +81,8 @@ public class Solver : MonoBehaviour {
         Destroy(_boundaryTex);
         Destroy(_fluidTex0);
         Destroy(_fluidTex1);
+		Destroy (_imageTex0);
+		Destroy (_imageTex1);
     }
     void InitSolver() {
         ReleaseSolver();
@@ -66,8 +92,12 @@ public class Solver : MonoBehaviour {
         _boundaryTex = new Texture2D(width, height, TextureFormat.ARGB32, false);
         _fluidTex0 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
         _fluidTex1 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
-        _fluidTex0.wrapMode = _fluidTex1.wrapMode = _initTex.wrapMode = TextureWrapMode.Clamp;
-        _fluidTex0.filterMode = _fluidTex1.filterMode = _initTex.filterMode = FilterMode.Bilinear;
+		_imageTex0 = new RenderTexture (imageTex.width, imageTex.height, 0, RenderTextureFormat.ARGB32);
+		_imageTex1 = new RenderTexture (imageTex.width, imageTex.height, 0, RenderTextureFormat.ARGB32);
+		_fluidTex0.wrapMode = _fluidTex1.wrapMode = _imageTex0.wrapMode = _imageTex1.wrapMode
+			= _initTex.wrapMode = TextureWrapMode.Clamp;
+		_fluidTex0.filterMode = _fluidTex1.filterMode = _imageTex0.filterMode = _imageTex1.filterMode
+			= _initTex.filterMode = FilterMode.Bilinear;
 
         var initData = _initTex.GetPixels();
         var boundaryData = _boundaryTex.GetPixels();
@@ -86,29 +116,46 @@ public class Solver : MonoBehaviour {
         _initTex.Apply();
         _boundaryTex.Apply();
         Graphics.Blit(_initTex, _fluidTex0);
+		Graphics.Blit (imageTex, _imageTex0);
     }
     void UpdateSolver(float dt) {
         var kvis = vis / rho0;
         var s = k * (dx * dx) / (dt * rho0);
-        var f = (Vector4)(forcePower * _forceThrottle);
+		var f = (Vector4)(_forceVector * _forceThrottle);
+		var fluidStepSize = new Vector4 (1f / width, 1f / height, 0f, 0f);
 
         _solverMat.SetTexture(PROP_FLUID_TEX, _fluidTex0);
-        _solverMat.SetTexture(PROP_FLUID_TEX, _fluidTex0);
+		_solverMat.SetVector (PROP_FLUID_TEX_STEP_SIZE, fluidStepSize);
         _solverMat.SetTexture(PROP_BOUNDARY_TEX, _boundaryTex);
         _solverMat.SetTexture(PROP_FORCE_TEX, forceTex);
+		_solverMat.SetTextureOffset (PROP_FORCE_TEX, _forceTexOffset);
         _solverMat.SetFloat(PROP_DT, dt);
         _solverMat.SetFloat(PROP_K_VIS, kvis);
         _solverMat.SetFloat(PROP_S, s);
         _solverMat.SetVector(PROP_FORCE_POWER, f);
-        Graphics.Blit(null, _fluidTex1, _solverMat, SOLVER_FLUID);
-        Swap();
+		Graphics.Blit (null, _fluidTex1, _solverMat, SOLVER_FLUID);
+		Swap (ref _fluidTex0, ref _fluidTex1);
     }
-    void NotifyResult() {
+	void NotifyResult(Texture outputTex) {
         foreach (var mat in outputMats)
-            mat.mainTexture = _fluidTex0;
+			mat.mainTexture = outputTex;
     }
-    void Swap() {
-        var tmpField = _fluidTex0; _fluidTex0 = _fluidTex1; _fluidTex1 = tmpField;
-    }
+	void Swap<T>(ref T t0, ref T t1) { var tmp = t0; t0 = t1; t1 = tmp; }
 
+	Vector3 UpdateMousePos (Vector3 mousePos) {
+		var dx = mousePos - _mousePos;
+		_mousePos = mousePos;
+		return dx;
+	}
+
+	void UpdateImage (float dt) {
+		var fluidStepSize = new Vector4 (1f / width, 1f / height, 0f, 0f);
+
+		_solverMat.SetTexture (PROP_FLUID_TEX, _fluidTex0);
+		_solverMat.SetVector (PROP_FLUID_TEX_STEP_SIZE, fluidStepSize);
+		_solverMat.SetTexture (PROP_IMAGE_TEX, _imageTex0);
+		_solverMat.SetFloat (PROP_DT, dt);
+		Graphics.Blit (null, _imageTex1, _solverMat, SOLVER_ADVECT);
+		Swap (ref _imageTex0, ref _imageTex1);
+	}
 }
