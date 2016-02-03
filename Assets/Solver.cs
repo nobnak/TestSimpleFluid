@@ -2,11 +2,6 @@
 using System.Collections;
 
 public class Solver : MonoBehaviour {
-    public enum ViewModeEnum { Null = 0, Velocity, Density }
-
-    public const string KW_VIEW_VELOCITY = "VIEW_VELOCITY";
-    public const string KW_VIEW_DENSITY  = "VIEW_DENSITY";
-
     public const string PROP_FIELD_TEX = "_MainTex";
     public const string PROP_BOUNDARY_TEX = "_BoundaryTex";
     public const string PROP_FORCE_TEX = "_ForceTex";
@@ -22,13 +17,12 @@ public class Solver : MonoBehaviour {
     public KeyCode forceKey = KeyCode.Space;
     public Texture2D forceTex;
 
-    public ViewModeEnum viewMode;
     public int width = 256;
     public int height = 256;
 
     public float k = 0.12f;
     public float vis = 1.8e-5f;
-    public float forcePower = 0.1f;
+    public Vector2 forcePower = new Vector2(0.1f, 0.1f);
 
     public Material[] outputMats;
 
@@ -43,7 +37,6 @@ public class Solver : MonoBehaviour {
         InitSolver();
 	}
 	void Update () {
-        UpdateKeyword();
         _forceThrottle = (Input.GetKey(forceKey) ? 1f : 0f);
 	}
     void FixedUpdate() {
@@ -93,7 +86,7 @@ public class Solver : MonoBehaviour {
     void UpdateSolver(float dt) {
         var kvis = vis / rho0;
         var s = k * (dx * dx) / (dt * rho0);
-        var f = forcePower * _forceThrottle;
+        var f = (Vector4)(forcePower * _forceThrottle);
 
         _solverMat.SetTexture(PROP_FIELD_TEX, _fieldTex0);
         _solverMat.SetTexture(PROP_BOUNDARY_TEX, _boundaryTex);
@@ -101,7 +94,7 @@ public class Solver : MonoBehaviour {
         _solverMat.SetFloat(PROP_DT, dt);
         _solverMat.SetFloat(PROP_K_VIS, kvis);
         _solverMat.SetFloat(PROP_S, s);
-        _solverMat.SetFloat(PROP_FORCE_POWER, f);
+        _solverMat.SetVector(PROP_FORCE_POWER, f);
         Graphics.Blit(_fieldTex0, _fieldTex1, _solverMat);
         Swap();
     }
@@ -111,19 +104,6 @@ public class Solver : MonoBehaviour {
     }
     void Swap() {
         var tmpField = _fieldTex0; _fieldTex0 = _fieldTex1; _fieldTex1 = tmpField;
-    }
-
-    void UpdateKeyword() {
-        Shader.DisableKeyword(KW_VIEW_VELOCITY);
-        Shader.DisableKeyword(KW_VIEW_DENSITY);
-        switch (viewMode) {
-        case ViewModeEnum.Velocity:
-            Shader.EnableKeyword(KW_VIEW_VELOCITY);
-            break;
-        case ViewModeEnum.Density:
-            Shader.EnableKeyword(KW_VIEW_DENSITY);
-            break;
-        }
     }
 
 }

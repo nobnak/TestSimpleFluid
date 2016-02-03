@@ -41,7 +41,7 @@
 			float _KVis;
 			float _S;
 			sampler2D _ForceTex;
-			float _ForcePower;
+			float4 _ForcePower;
 
 			fixed4 frag (v2f i) : SV_Target {
 				float2 duv = _MainTex_TexelSize.xy;
@@ -55,14 +55,14 @@
 				float4 dudy = DIFF * (ut - ub);
 
 				// Mass Conservation (Density)
-				float2 rGrad = float2(dudx.w, dudy.w);
 				float uDiv = dudx.x + dudy.y;
+				float2 rGrad = float2(dudx.w, dudy.w);
 				u.w -= _Dt * dot(u.xyw, float3(rGrad, uDiv));
 				u.w = clamp(u.w, 0.5, 3.0);
 
 				// Momentum Conservation (Velocity)
 				u.xy = tex2D(_MainTex, i.uv - _Dt * duv * u.xy).xy;
-				float2 f = _ForcePower * (tex2D(_ForceTex, i.uv).xy - 0.5);
+				float2 f = _ForcePower.xy * tex2D(_ForceTex, i.uv).x;
 				float2 uLaplacian = DDIFF * (ul.xy + ur.xy + ub.xy + ut.xy - 4.0 * u.xy);
 				u.xy += _Dt * (-_S * rGrad + f + _KVis * uLaplacian);
 
