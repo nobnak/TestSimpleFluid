@@ -6,7 +6,6 @@ public class Solver : MonoBehaviour {
     public const int SOLVER_ADVECT = 1;
 
     public const string PROP_FLUID_TEX = "_FluidTex";
-	public const string PROP_FLUID_TEX_STEP_SIZE = "_FluidTex_StepSize";
     public const string PROP_BOUNDARY_TEX = "_BoundaryTex";
     public const string PROP_FORCE_TEX = "_ForceTex";
 	public const string PROP_IMAGE_TEX = "_ImageTex";
@@ -30,7 +29,6 @@ public class Solver : MonoBehaviour {
     public float k = 0.12f;
     public float vis = 1.8e-5f;
 	public float forcePower = 1f;
-	public Vector2 forceDir = new Vector2(0f, 1f);
 	public float advectSpeed = 1f;
 
     public Material[] outputMats;
@@ -122,10 +120,8 @@ public class Solver : MonoBehaviour {
         var kvis = vis / rho0;
         var s = k * (dx * dx) / (dt * rho0);
 		var f = (Vector4)(_forceVector * _forceThrottle);
-		var fluidStepSize = new Vector4 (1f / width, 1f / height, 0f, 0f);
 
         _solverMat.SetTexture(PROP_FLUID_TEX, _fluidTex0);
-		_solverMat.SetVector (PROP_FLUID_TEX_STEP_SIZE, fluidStepSize);
         _solverMat.SetTexture(PROP_BOUNDARY_TEX, _boundaryTex);
         _solverMat.SetTexture(PROP_FORCE_TEX, forceTex);
 		_solverMat.SetTextureOffset (PROP_FORCE_TEX, _forceTexOffset);
@@ -152,7 +148,6 @@ public class Solver : MonoBehaviour {
 		var fluidStepSize = new Vector4 (1f / width, 1f / height, 0f, 0f);
 
 		_solverMat.SetTexture (PROP_FLUID_TEX, _fluidTex0);
-		_solverMat.SetVector (PROP_FLUID_TEX_STEP_SIZE, fluidStepSize);
 		_solverMat.SetTexture (PROP_IMAGE_TEX, _imageTex0);
 		_solverMat.SetFloat (PROP_DT, dt);
 		Graphics.Blit (null, _imageTex1, _solverMat, SOLVER_ADVECT);

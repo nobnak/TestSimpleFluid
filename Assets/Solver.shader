@@ -29,7 +29,7 @@
 
 			// (u, v, w, rho)
 			sampler2D _FluidTex;
-			float4 _FluidTex_StepSize;
+			float4 _FluidTex_TexelSize;
 			sampler2D _ImageTex;
 			float4 _ImageTex_TexelSize;
 
@@ -57,7 +57,7 @@
 			#pragma fragment frag
 
 			float4 frag (v2f i) : SV_Target {
-				float2 duv = _FluidTex_StepSize.xy;
+				float2 duv = _FluidTex_TexelSize.xy;
 				float4 u = tex2D(_FluidTex, i.uv);
 				float4 ul = tex2D(_FluidTex, i.uv - float2(duv.x, 0));
 				float4 ur = tex2D(_FluidTex, i.uv + float2(duv.x, 0));
@@ -94,7 +94,7 @@
 			#pragma fragment frag
 
 			float4 frag (v2f i) : SV_Target {
-				float2 duv = _FluidTex_StepSize.xy;
+				float2 duv = _FluidTex_TexelSize.xy;
 				float4 u = tex2D(_FluidTex, i.uv);
 				float4 c = tex2D(_ImageTex, i.uv - _Dt * duv * u.xy);
 				return c;
