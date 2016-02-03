@@ -2,9 +2,13 @@
 using System.Collections;
 
 public class Solver : MonoBehaviour {
-    public const string PROP_FIELD_TEX = "_MainTex";
+    public const int SOLVER_FLUID = 0;
+    public const int SOLVER_ADVECT = 1;
+
+    public const string PROP_FLUID_TEX = "_FluidTex";
     public const string PROP_BOUNDARY_TEX = "_BoundaryTex";
     public const string PROP_FORCE_TEX = "_ForceTex";
+    public const string PROP_VISUAL_TEX = "_VisualTex";
     public const string PROP_DT = "_Dt";
     public const string PROP_K_VIS = "_KVis";
     public const string PROP_S = "_S";
@@ -28,8 +32,8 @@ public class Solver : MonoBehaviour {
 
     Texture2D _initTex;
     Texture2D _boundaryTex;
-    RenderTexture _fieldTex0;
-    RenderTexture _fieldTex1;
+    RenderTexture _fluidTex0;
+    RenderTexture _fluidTex1;
     Material _solverMat;
     float _forceThrottle = 0f;
 
@@ -51,8 +55,8 @@ public class Solver : MonoBehaviour {
         Destroy(_solverMat);
         Destroy(_initTex);
         Destroy(_boundaryTex);
-        Destroy(_fieldTex0);
-        Destroy(_fieldTex1);
+        Destroy(_fluidTex0);
+        Destroy(_fluidTex1);
     }
     void InitSolver() {
         ReleaseSolver();
@@ -60,10 +64,10 @@ public class Solver : MonoBehaviour {
         _solverMat = new Material(solverShader);
         _initTex = new Texture2D(width, height, TextureFormat.ARGB32, false);
         _boundaryTex = new Texture2D(width, height, TextureFormat.ARGB32, false);
-        _fieldTex0 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
-        _fieldTex1 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
-        _fieldTex0.wrapMode = _fieldTex1.wrapMode = _initTex.wrapMode = TextureWrapMode.Clamp;
-        _fieldTex0.filterMode = _fieldTex1.filterMode = _initTex.filterMode = FilterMode.Bilinear;
+        _fluidTex0 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
+        _fluidTex1 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBFloat);
+        _fluidTex0.wrapMode = _fluidTex1.wrapMode = _initTex.wrapMode = TextureWrapMode.Clamp;
+        _fluidTex0.filterMode = _fluidTex1.filterMode = _initTex.filterMode = FilterMode.Bilinear;
 
         var initData = _initTex.GetPixels();
         var boundaryData = _boundaryTex.GetPixels();
@@ -81,29 +85,30 @@ public class Solver : MonoBehaviour {
         _boundaryTex.SetPixels(boundaryData);
         _initTex.Apply();
         _boundaryTex.Apply();
-        Graphics.Blit(_initTex, _fieldTex0);
+        Graphics.Blit(_initTex, _fluidTex0);
     }
     void UpdateSolver(float dt) {
         var kvis = vis / rho0;
         var s = k * (dx * dx) / (dt * rho0);
         var f = (Vector4)(forcePower * _forceThrottle);
 
-        _solverMat.SetTexture(PROP_FIELD_TEX, _fieldTex0);
+        _solverMat.SetTexture(PROP_FLUID_TEX, _fluidTex0);
+        _solverMat.SetTexture(PROP_FLUID_TEX, _fluidTex0);
         _solverMat.SetTexture(PROP_BOUNDARY_TEX, _boundaryTex);
         _solverMat.SetTexture(PROP_FORCE_TEX, forceTex);
         _solverMat.SetFloat(PROP_DT, dt);
         _solverMat.SetFloat(PROP_K_VIS, kvis);
         _solverMat.SetFloat(PROP_S, s);
         _solverMat.SetVector(PROP_FORCE_POWER, f);
-        Graphics.Blit(_fieldTex0, _fieldTex1, _solverMat);
+        Graphics.Blit(null, _fluidTex1, _solverMat, SOLVER_FLUID);
         Swap();
     }
     void NotifyResult() {
         foreach (var mat in outputMats)
-            mat.mainTexture = _fieldTex0;
+            mat.mainTexture = _fluidTex0;
     }
     void Swap() {
-        var tmpField = _fieldTex0; _fieldTex0 = _fieldTex1; _fieldTex1 = tmpField;
+        var tmpField = _fluidTex0; _fluidTex0 = _fluidTex1; _fluidTex1 = tmpField;
     }
 
 }
