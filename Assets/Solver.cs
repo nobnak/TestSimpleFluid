@@ -29,7 +29,7 @@ public class Solver : MonoBehaviour {
     public float k = 0.12f;
     public float vis = 1.8e-5f;
 	public float forcePower = 1f;
-	public float advectSpeed = 1f;
+	public float timeStep = 0.1f;
 
     public Material[] outputMats;
 
@@ -51,7 +51,7 @@ public class Solver : MonoBehaviour {
 	void Update () {
 		var mousePos = Input.mousePosition;
 		var dx = UpdateMousePos(mousePos);
-		var dt = Time.deltaTime;
+        var dt = timeStep;
 		_forceThrottle = 0f;
 
 		RaycastHit hit;
@@ -62,12 +62,13 @@ public class Solver : MonoBehaviour {
 			_forceTexOffset = -hit.textureCoord + new Vector2 (0.5f, 0.5f);
 		}
 
-		UpdateImage(dt * advectSpeed);
+        UpdateSolver(dt);
+        UpdateImage(dt);
+        #if true
 		NotifyResult(_imageTex0);
-		//NotifyResult(_fluidTex0);
-	}
-    void FixedUpdate() {
-		UpdateSolver(Time.fixedDeltaTime);
+        #else
+		NotifyResult(_fluidTex0);
+        #endif
 	}
     void OnDestroy() {
         ReleaseSolver();
