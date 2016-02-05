@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Solver" {
+﻿Shader "SimpleFluid/Solver" {
 	Properties {
 		_FluidTex ("Fluid", 2D) = "white" {}
 		_ImageTex ("Image", 2D) = "black" {}

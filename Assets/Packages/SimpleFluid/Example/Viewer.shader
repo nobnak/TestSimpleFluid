@@ -1,4 +1,4 @@
-﻿Shader "Unlit/Viewer" {
+﻿Shader "SimpleFluid/Unlit/Viewer" {
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
 		_Scale ("Scale", Float) = 1

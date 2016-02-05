@@ -1,4 +1,4 @@
-﻿Shader "Unlit/Monotone" {
+﻿Shader "SimpleFluid/Unlit/Monotone" {
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
 	}
