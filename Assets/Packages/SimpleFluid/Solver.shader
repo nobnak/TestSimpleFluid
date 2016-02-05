@@ -23,7 +23,6 @@
 
 			struct v2f {
 				float2 uv : TEXCOORD0;
-				float2 uvForce : TEXCOORD1;
 				float4 vertex : SV_POSITION;
 			};
 
@@ -39,13 +38,12 @@
 			float _S;
 			sampler2D _ForceTex;
 			float4 _ForceTex_ST;
-			float4 _ForcePower;
+			float _ForcePower;
 
 			v2f vert (appdata v) {
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.uv = v.uv;
-				o.uvForce = TRANSFORM_TEX(v.uv, _ForceTex);
 				return o;
 			}
 		ENDCG
@@ -77,7 +75,8 @@
 
 				// Momentum Conservation (Velocity)
 				u.xy = tex2D(_FluidTex, i.uv - _Dt * duv * u.xy).xy;
-				float2 f = _ForcePower.xy * tex2D(_ForceTex, i.uvForce).x;
+				float4 fTex = tex2D(_ForceTex, i.uv);
+				float2 f = _ForcePower * fTex.xy;
 				u.xy += _Dt * (-_S * rGrad + f + _KVis * uLaplacian);
 
 				float2 boundary = tex2D(_BoundaryTex, i.uv);
