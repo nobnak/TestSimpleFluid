@@ -23,8 +23,6 @@ namespace SimpleFluid {
         public Texture forceTex;
         public Texture2D imageTex;
 
-        public int lod = 1;
-
         public float k = 0.12f;
         public float vis = 1.8e-5f;
     	public float timeStep = 0.1f;
@@ -35,12 +33,12 @@ namespace SimpleFluid {
         RenderTexture _fluidTex1;
         float _timeAccum = 0f;
         int _width = -1;
-        int _height = -1;       
+        int _height = -1;
 
         public static void Swap<T>(ref T t0, ref T t1) { var tmp = t0; t0 = t1; t1 = tmp; }
 
-        public void Solve(float dt, int imageWidth, int imageHeight) {
-            InitSolver(imageWidth, imageHeight);
+        public void Solve(float dt, int width, int height) {
+            InitSolver(width, height);
             var nIterations = CalculateIterations(dt);
             for (var i = 0; i < nIterations; i++) {
                 UpdateSolver(timeStep);
@@ -60,10 +58,7 @@ namespace SimpleFluid {
             Object.Destroy(_fluidTex0);
             Object.Destroy(_fluidTex1);
         }
-        void InitSolver(int imageWidth, int imageHeight) {
-            var width = imageWidth >> lod;
-            var height = imageHeight >> lod;
-
+        void InitSolver(int width, int height) {
             if (width != _width || height != _height) {
                 ReleaseSolver();
                 _width = width;
