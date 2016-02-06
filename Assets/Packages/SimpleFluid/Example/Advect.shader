@@ -2,6 +2,7 @@
 	Properties {
 		_MainTex ("Image", 2D) = "black" {}
 		_FluidTex ("Fluid", 2D) = "white" {}
+		_RefTex ("Reference Image", 2D) = "black" {}
 		_Dt ("Delta Time", Float) = 0.1
 	}
 	SubShader {
@@ -29,6 +30,7 @@
 			float4 _MainTex_TexelSize;
 			sampler2D _FluidTex;
 			float4 _FluidTex_TexelSize;
+			sampler2D _RefTex;
 
 			float _Dt;
 
@@ -42,11 +44,10 @@
 			float4 frag (v2f i) : SV_Target {
 				float2 duv = _FluidTex_TexelSize.xy;
 				float4 u = tex2D(_FluidTex, i.uv);
-				float4 c = tex2D(_MainTex, i.uv);
-				float cAdv = tex2D(_MainTex, i.uv - _Dt * duv * u.xy).x;
+				float4 cRef = tex2D(_RefTex, i.uv);
+				float4 cAdv = tex2D(_MainTex, i.uv - _Dt * duv * u.xy);
 
-				cAdv = clamp(lerp(cAdv, c.y, c.y * 0.1) - 0.01, 0.0, 2.0);
-				return float4(cAdv, c.yzw);
+				return clamp(cAdv, 0.0, 2.0);
 			}
 			ENDCG
 		}

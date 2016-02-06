@@ -20,12 +20,13 @@ namespace SimpleFluid {
 
         public Material solverMat;
         public float forcePower = 1f;
-        public Texture forceTex;
-        public Texture2D imageTex;
 
         public float k = 0.12f;
         public float vis = 1.8e-5f;
     	public float timeStep = 0.1f;
+
+		[HideInInspector]
+		public Texture forceTex;
 
         Texture2D _initTex;
         Texture2D _boundaryTex;

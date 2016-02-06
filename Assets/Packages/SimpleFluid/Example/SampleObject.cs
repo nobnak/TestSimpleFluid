@@ -5,6 +5,7 @@ namespace SimpleFluid {
 
     public class SampleObject : MonoBehaviour {
         public const string PROP_FLUID_TEX = "_FluidTex";
+		public const string PROP_REFERENCE_TEX = "_RefTex";
         public const string PROP_DT = "_Dt";
 
 		public const string PROP_DIR_AND_CENTER = "_DirAndCenter";
@@ -68,6 +69,7 @@ namespace SimpleFluid {
 		void UpdateImage (float dt) {
 			InitImage ();
 			solver.SetProperties (advectMat, PROP_FLUID_TEX);
+			advectMat.SetTexture (PROP_REFERENCE_TEX, imageTex);
     		advectMat.SetFloat (PROP_DT, dt);
             Graphics.Blit (_imageTex0, _imageTex1, advectMat);
     		Solver.Swap (ref _imageTex0, ref _imageTex1);
@@ -75,8 +77,8 @@ namespace SimpleFluid {
 		void InitImage() {
 			if (_imageTex0 == null || _imageTex0.width != imageTex.width || _imageTex0.height != imageTex.height) {
 				ReleaseImage();
-				_imageTex0 = new RenderTexture (imageTex.width, imageTex.height, 0, RenderTextureFormat.ARGB32);
-				_imageTex1 = new RenderTexture (imageTex.width, imageTex.height, 0, RenderTextureFormat.ARGB32);
+				_imageTex0 = new RenderTexture (imageTex.width, imageTex.height, 0, RenderTextureFormat.ARGBFloat);
+				_imageTex1 = new RenderTexture (imageTex.width, imageTex.height, 0, RenderTextureFormat.ARGBFloat);
 				_imageTex0.filterMode = _imageTex1.filterMode = FilterMode.Bilinear;
 				_imageTex0.wrapMode = _imageTex1.wrapMode = TextureWrapMode.Clamp;
 				Graphics.Blit (imageTex, _imageTex0);
