@@ -1,11 +1,14 @@
 fileFormatVersion: 2
 guid: c93b7cedf0efb0841b98165e2773c70e
-timeCreated: 1454934418
+timeCreated: 1454948034
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - solver: {fileID: 4800000, guid: d2cb7448da6a062489f1fa7af808fc92, type: 3}
+  - viewCollider: {instanceID: 0}
+  - forceFieldMat: {fileID: 2100000, guid: 6825da0cea7fe8c499c346d233555ed5, type: 2}
+  - advectMat: {fileID: 2100000, guid: d5b088054081b5242b662262ee929b5c, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
