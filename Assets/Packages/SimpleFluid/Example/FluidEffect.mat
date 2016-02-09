@@ -38,4 +38,4 @@ Material:
       data:
         first:
           name: _Weight
-        second: {r: 0.7, g: 1.5, b: 1, a: 1}
+        second: {r: 0.5, g: 1, b: 1, a: 1}

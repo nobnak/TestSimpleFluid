@@ -26,5 +26,9 @@ Material:
       data:
         first:
           name: _Rate
-        second: 0.005
+        second: 0.01
+      data:
+        first:
+          name: _Disappoint
+        second: 0.479
     m_Colors: {}
