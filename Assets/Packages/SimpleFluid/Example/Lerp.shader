@@ -16,6 +16,7 @@
 			#include "UnityCG.cginc"
 
             sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
             float _Rate;
 
 			struct appdata {
@@ -29,9 +30,15 @@
 			};
 
 			v2f vert (appdata v) {
+                float2 uvFromBottom = v.uv;
+                #if UNITY_UV_STARTS_AT_TOP
+                if (_MainTex_TexelSize.y < 0)
+                    uvFromBottom.y = 1 - uvFromBottom.y;
+                #endif
+                   
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.uv = v.uv;
+				o.uv = uvFromBottom;
 				return o;
 			}
 			

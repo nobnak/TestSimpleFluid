@@ -22,8 +22,8 @@ namespace SimpleFluid {
         public float forcePower = 1f;
 
         public float k = 0.12f;
-        public float vis = 1.8e-5f;
-    	public float timeStep = 0.1f;
+        public float vis = 0f;
+    	public float timeStep = 0.05f;
 
 		[HideInInspector]
 		public Texture forceTex;

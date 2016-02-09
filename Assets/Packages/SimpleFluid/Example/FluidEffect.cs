@@ -22,6 +22,8 @@ namespace SimpleFluid {
 		public int lod = 1;
         public float timeScale = 10f;
 
+        public Material forceFieldViewerMat;
+
         Camera _attachedCamera;
         Vector3 _mousePos;
     	RenderTexture _imageTex0;
@@ -56,8 +58,14 @@ namespace SimpleFluid {
 		void OnRenderImage(RenderTexture src, RenderTexture dst) {
             Graphics.Blit (src, _imageTex0, lerpMat);
 
+            #if true
+            Graphics.Blit (_imageTex0, dst);
+            //Graphics.Blit(_forceFieldTex, dst, forceFieldViewerMat);
+            #else
+
             fluidEffectMat.SetTexture (PROP_IMAGE_TEX, _imageTex0);
             Graphics.Blit (src, dst, fluidEffectMat);
+            #endif
 		}
         void OnDestroy() {
             Release();

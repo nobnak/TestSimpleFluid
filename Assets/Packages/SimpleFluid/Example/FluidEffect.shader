@@ -17,6 +17,7 @@
             #include "ColorCollect.cginc"
 
             sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
             sampler2D _ImageTex;
             float4 _Weight;
 
