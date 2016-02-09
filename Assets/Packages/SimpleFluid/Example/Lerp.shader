@@ -29,16 +29,10 @@
 				float4 vertex : SV_POSITION;
 			};
 
-			v2f vert (appdata v) {
-                float2 uvFromBottom = v.uv;
-                #if UNITY_UV_STARTS_AT_TOP
-                if (_MainTex_TexelSize.y < 0)
-                    uvFromBottom.y = 1 - uvFromBottom.y;
-                #endif
-                   
+			v2f vert (appdata v) {                   
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.uv = uvFromBottom;
+				o.uv = v.uv;
 				return o;
 			}
 			
