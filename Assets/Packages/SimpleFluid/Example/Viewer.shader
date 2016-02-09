@@ -29,17 +29,6 @@
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 
-			float3 HUE2RGB(float h) {
-				float r = abs(h * 6 - 3) - 1;
-				float g = 2 - abs(h * 6 - 2);
-				float b = 2 - abs(h * 6 - 4);
-				return saturate(float3(r, g, b));
-			}
-			float3 HSV2RGB(float3 hsv) {
-				float3 rgb = HUE2RGB(hsv.x);
-				return ((rgb - 1) * hsv.y + 1) * hsv.z;
-			}
-			
 			v2f vert (appdata v) {
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);

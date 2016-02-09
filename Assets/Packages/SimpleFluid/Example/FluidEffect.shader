@@ -1,8 +1,8 @@
-﻿Shader "SimpleFluid/Advect" {
+﻿Shader "SimpleFluid/FluidEffect" {
 	Properties {
-		_MainTex ("Image", 2D) = "black" {}
-		_FluidTex ("Fluid", 2D) = "white" {}
-		_Dt ("Delta Time", Float) = 0.1
+		_MainTex ("Texture", 2D) = "white" {}
+        _ImageTex ("Image", 2D) = "black" {}
+        _Weight ("Weight", Vector) = (1, 1, 1, 1)
 	}
 	SubShader {
 		Cull Off ZWrite Off ZTest Always
@@ -10,11 +10,15 @@
 
 		Pass {
 			CGPROGRAM
-			#pragma target 5.0
 			#pragma vertex vert
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
+            #include "ColorCollect.cginc"
+
+            sampler2D _MainTex;
+            sampler2D _ImageTex;
+            float4 _Weight;
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -26,26 +30,17 @@
 				float4 vertex : SV_POSITION;
 			};
 
-			sampler2D _MainTex;
-			float4 _MainTex_TexelSize;
-			sampler2D _FluidTex;
-			float4 _FluidTex_TexelSize;
-
-			float _Dt;
-
 			v2f vert (appdata v) {
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.uv = v.uv;
 				return o;
 			}
-
+			
 			float4 frag (v2f i) : SV_Target {
-				float2 duv = _FluidTex_TexelSize.xy;
-				float4 u = tex2D(_FluidTex, i.uv);
-				float4 c = tex2D(_MainTex, i.uv - _Dt * duv * u.xy);
-
-				return clamp(c, 0.0, 2.0);
+				float4 csrc = tex2D(_MainTex, i.uv);
+                float4 cimage = tex2D(_ImageTex, i.uv);
+				return csrc * _Weight.x + cimage * _Weight.y;
 			}
 			ENDCG
 		}

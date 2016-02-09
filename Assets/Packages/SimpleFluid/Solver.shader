@@ -86,22 +86,5 @@
 			}
 			ENDCG
 		}
-
-		Pass {
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
-
-			float4 frag (v2f i) : SV_Target {
-				float2 duv = _FluidTex_TexelSize.xy;
-				float4 u = tex2D(_FluidTex, i.uv);
-				float4 c = tex2D(_ImageTex, i.uv);
-				float cAdv = tex2D(_ImageTex, i.uv - _Dt * duv * u.xy).x;
-
-				cAdv = clamp(lerp(cAdv, c.y, c.y * 0.1) - 0.01, 0.0, 2.0);
-				return float4(cAdv, c.yzw);
-			}
-			ENDCG
-		}
 	}
 }

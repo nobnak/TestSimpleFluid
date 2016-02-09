@@ -1,20 +1,22 @@
-﻿Shader "SimpleFluid/Advect" {
+﻿Shader "SimpleFluid/Lerp" {
 	Properties {
-		_MainTex ("Image", 2D) = "black" {}
-		_FluidTex ("Fluid", 2D) = "white" {}
-		_Dt ("Delta Time", Float) = 0.1
+		_MainTex ("Texture", 2D) = "white" {}
+        _Rate ("Rate", Range(0, 1)) = 0.1
 	}
 	SubShader {
 		Cull Off ZWrite Off ZTest Always
+        Blend SrcAlpha OneMinusSrcAlpha
         ColorMask RGB
 
 		Pass {
 			CGPROGRAM
-			#pragma target 5.0
 			#pragma vertex vert
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
+
+            sampler2D _MainTex;
+            float _Rate;
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -26,26 +28,16 @@
 				float4 vertex : SV_POSITION;
 			};
 
-			sampler2D _MainTex;
-			float4 _MainTex_TexelSize;
-			sampler2D _FluidTex;
-			float4 _FluidTex_TexelSize;
-
-			float _Dt;
-
 			v2f vert (appdata v) {
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.uv = v.uv;
 				return o;
 			}
-
+			
 			float4 frag (v2f i) : SV_Target {
-				float2 duv = _FluidTex_TexelSize.xy;
-				float4 u = tex2D(_FluidTex, i.uv);
-				float4 c = tex2D(_MainTex, i.uv - _Dt * duv * u.xy);
-
-				return clamp(c, 0.0, 2.0);
+				float4 c = tex2D(_MainTex, i.uv);
+                return float4(c.rgb, _Rate);
 			}
 			ENDCG
 		}
