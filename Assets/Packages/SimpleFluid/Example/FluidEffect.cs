@@ -6,6 +6,7 @@ namespace SimpleFluid {
     public class FluidEffect : MonoBehaviour {
         public const string PROP_FLUID_TEX = "_FluidTex";
         public const string PROP_IMAGE_TEX = "_ImageTex";
+		public const string PROP_REF_TEX = "_RefTex";
         public const string PROP_DT = "_Dt";
 
 		public const string PROP_DIR_AND_CENTER = "_DirAndCenter";
@@ -54,7 +55,9 @@ namespace SimpleFluid {
             UpdateImage (dt);
         }
 		void OnRenderImage(RenderTexture src, RenderTexture dst) {
-            Graphics.Blit (src, _imageTex0, lerpMat);
+			lerpMat.SetTexture (PROP_REF_TEX, src);
+			Graphics.Blit (_imageTex0, _imageTex1, lerpMat);
+			Solver.Swap (ref _imageTex0, ref _imageTex1);
 
             fluidEffectMat.SetTexture (PROP_IMAGE_TEX, _imageTex0);
             Graphics.Blit (src, dst, fluidEffectMat);

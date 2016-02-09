@@ -1,12 +1,12 @@
 ﻿Shader "SimpleFluid/Lerp" {
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
-        _Rate ("Rate", Range(0, 1)) = 0.1
-        _Disappoint ("Dissappoint", Range(0, 1)) = 0.01
+		_RefTex ("Reference", 2D) = "white" {}
+        _Restoration ("Restoration", Range(0, 1)) = 0.1
+        _Dissipation ("Dissipation", Range(0, 1)) = 0.01
 	}
 	SubShader {
 		Cull Off ZWrite Off ZTest Always
-        Blend One OneMinusSrcAlpha
         ColorMask RGB
 
 		Pass {
@@ -18,8 +18,9 @@
 
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
-            float _Rate;
-            float _Dissapoint;
+            sampler2D _RefTex;
+            float _Restoration;
+            float _Dissipation;
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -39,9 +40,9 @@
 			}
 			
 			float4 frag (v2f i) : SV_Target {
-				float4 c = tex2D(_MainTex, i.uv);
-				c.rgb *= c.a * _Rate;
-                return float4(c.rgb - _Dissapoint, c.a * _Rate);
+				float4 cimg = tex2D(_MainTex, i.uv);
+				float4 cref = tex2D(_RefTex, i.uv);
+                return lerp(cimg, cref, cref.a * _Restoration) - _Dissipation;
 			}
 			ENDCG
 		}
