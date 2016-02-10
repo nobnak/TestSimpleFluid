@@ -14,7 +14,6 @@
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
-            #include "ColorCollect.cginc"
 
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;

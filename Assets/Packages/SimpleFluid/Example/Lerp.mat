@@ -36,14 +36,14 @@ Material:
         second: 0.01
       data:
         first:
-          name: _Disappoint
-        second: 0.479
-      data:
-        first:
           name: _Restoration
         second: 0.01
       data:
         first:
           name: _Dissipation
         second: 0.0005
+      data:
+        first:
+          name: _Disappoint
+        second: 0.479
     m_Colors: {}

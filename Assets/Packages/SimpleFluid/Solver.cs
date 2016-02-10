@@ -24,6 +24,7 @@ namespace SimpleFluid {
         public float k = 0.12f;
         public float vis = 0f;
     	public float timeStep = 0.05f;
+        public float timeScale = 10f;
 
 		[HideInInspector]
 		public Texture forceTex;
@@ -36,14 +37,20 @@ namespace SimpleFluid {
         int _width = -1;
         int _height = -1;
 
+        public int Width { get { return _width; } }
+        public int Height { get { return _height; } }
+        public float DeltaTime { get { return Time.deltaTime * timeScale; } }
+
         public static void Swap<T>(ref T t0, ref T t1) { var tmp = t0; t0 = t1; t1 = tmp; }
 
-        public void Solve(float dt, int width, int height) {
-            InitSolver(width, height);
+        public void Solve(float dt) {
             var nIterations = CalculateIterations(dt);
             for (var i = 0; i < nIterations; i++) {
                 UpdateSolver(timeStep);
             }
+        }
+        public void SetSize(int width, int height) {
+            InitSolver (width, height);
         }
         public void SetProperties(Material mat, string fluidTex) {
             mat.SetTexture (fluidTex, _fluidTex0);
