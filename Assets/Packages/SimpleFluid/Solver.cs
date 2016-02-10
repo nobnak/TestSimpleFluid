@@ -26,17 +26,16 @@ namespace SimpleFluid {
     	public float timeStep = 0.05f;
         public float timeScale = 10f;
 
-		[HideInInspector]
-		public Texture forceTex;
-
         Texture2D _initTex;
         Texture2D _boundaryTex;
+        Texture _forceTex;
         RenderTexture _fluidTex0;
         RenderTexture _fluidTex1;
         float _timeAccum = 0f;
         int _width = -1;
         int _height = -1;
 
+        public Texture ForceTex { set { _forceTex = value; } get { return _forceTex; } }
         public int Width { get { return _width; } }
         public int Height { get { return _height; } }
         public float DeltaTime { get { return Time.deltaTime * timeScale; } }
@@ -104,7 +103,7 @@ namespace SimpleFluid {
 
             solverMat.SetTexture(PROP_FLUID_TEX, _fluidTex0);
             solverMat.SetTexture(PROP_BOUNDARY_TEX, _boundaryTex);
-            solverMat.SetTexture(PROP_FORCE_TEX, forceTex);
+            solverMat.SetTexture(PROP_FORCE_TEX, ForceTex);
             solverMat.SetFloat(PROP_FORCE_POWER, forcePower);
             solverMat.SetFloat(PROP_DT, dt);
             solverMat.SetFloat(PROP_K_VIS, kvis);

@@ -7,8 +7,9 @@ namespace SimpleFluid {
         public const string PROP_DIR_AND_CENTER = "_DirAndCenter";
         public const string PROP_INV_RADIUS = "_InvRadius";
 
-        public Solver solver;
+        public TextureEvent OnUpdateForceField;
 
+        public Solver solver;
         public Material forceFieldMat;
         public float forceRadius = 0.05f;
 
@@ -22,7 +23,6 @@ namespace SimpleFluid {
             InitOrResizeForceField (solver.Width, solver.Height);
 
             UpdateForceField();
-            solver.forceTex = _forceFieldTex;
         }
         void OnDestroy() {
             ReleaseForceField ();            
@@ -49,6 +49,11 @@ namespace SimpleFluid {
                 new Vector4(forceVector.x, forceVector.y, uv.x, uv.y));
             forceFieldMat.SetFloat(PROP_INV_RADIUS, 1f / forceRadius);
             Graphics.Blit(null, _forceFieldTex, forceFieldMat);
+
+            NotifyForceFieldUpdate ();
+        }
+        void NotifyForceFieldUpdate() {
+            OnUpdateForceField.Invoke (_forceFieldTex);            
         }
         Vector3 UpdateMousePos (Vector3 mousePos) {
             var dx = mousePos - _mousePos;
@@ -59,4 +64,5 @@ namespace SimpleFluid {
             Destroy (_forceFieldTex);
         }
     }
+
 }

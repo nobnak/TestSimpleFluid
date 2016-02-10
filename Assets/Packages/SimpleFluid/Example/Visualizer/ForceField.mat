@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Advect
-  m_Shader: {fileID: 4800000, guid: d1633eb3a86ae50448e0f4ea0e2d7a30, type: 3}
+  m_Name: ForceField
+  m_Shader: {fileID: 4800000, guid: 2843822a5f1beef47bd7c9c9dc97cbc8, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
@@ -22,23 +22,9 @@ Material:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _RefTex
-        second:
-          m_Texture: {fileID: 0}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _FluidTex
-        second:
-          m_Texture: {fileID: 0}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
-          name: _Dt
-        second: 0.04895216
+          name: _Scale
+        second: 5
     m_Colors: {}
