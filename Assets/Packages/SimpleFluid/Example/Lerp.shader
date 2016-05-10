@@ -28,20 +28,24 @@
 			};
 
 			struct v2f {
-				float2 uv : TEXCOORD0;
+				float4 uv : TEXCOORD0;
 				float4 vertex : SV_POSITION;
 			};
 
-			v2f vert (appdata v) {                   
+			v2f vert (appdata v) {
+                float2 uvb = v.uv;
+                if (_MainTex_TexelSize.y < 0)
+                    uvb.y = 1 - uvb.y;
+
 				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.uv = v.uv;
+				o.uv = float4(v.uv, uvb);
 				return o;
 			}
 			
 			float4 frag (v2f i) : SV_Target {
-				float4 cimg = tex2D(_MainTex, i.uv);
-				float4 cref = tex2D(_RefTex, i.uv);
+				float4 cimg = tex2D(_MainTex, i.uv.xy);
+				float4 cref = tex2D(_RefTex, i.uv.zw);
                 return lerp(cimg, cref, cref.a * _Restoration) - _Dissipation;
 			}
 			ENDCG

@@ -30,6 +30,7 @@ namespace SimpleFluid {
 
         void Start() {
             _attachedCamera = GetComponent<Camera> ();
+            _attachedCamera.depthTextureMode = DepthTextureMode.Depth;
             Init ();
         }
         void Update() {
