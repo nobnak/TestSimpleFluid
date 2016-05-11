@@ -34,8 +34,16 @@ Material:
         first:
           name: _ImagePower
         second: 2
+      data:
+        first:
+          name: _Power
+        second: 1
     m_Colors:
       data:
         first:
           name: _Weight
         second: {r: 0.3, g: 2, b: 1, a: 1}
+      data:
+        first:
+          name: _Shift
+        second: {r: 0, g: 0, b: 0, a: 0}

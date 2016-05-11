@@ -40,8 +40,8 @@ namespace SimpleFluid {
             UpdateImage (dt);
         }
 		void OnRenderImage(RenderTexture src, RenderTexture dst) {
-			lerpMat.SetTexture (PROP_REF_TEX, src);
-			Graphics.Blit (_imageTex0, _imageTex1, lerpMat);
+            lerpMat.SetTexture (PROP_REF_TEX, _imageTex0);
+			Graphics.Blit (src, _imageTex1, lerpMat);
 			Solver.Swap (ref _imageTex0, ref _imageTex1);
 
             fluidEffectMat.SetTexture (PROP_IMAGE_TEX, _imageTex0);
@@ -69,6 +69,7 @@ namespace SimpleFluid {
                 _imageTex0.filterMode = _imageTex1.filterMode = FilterMode.Bilinear;
                 _imageTex0.wrapMode = _imageTex1.wrapMode = TextureWrapMode.Clamp;
                 Clear(_imageTex0, Color.clear);
+                Clear (_imageTex1, Color.clear);
             }
         }
 		void UpdateImage (float dt) {
