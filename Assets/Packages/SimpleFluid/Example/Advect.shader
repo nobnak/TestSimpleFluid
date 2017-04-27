@@ -39,7 +39,7 @@
                     uvb.y = 1 - uvb.y;
 
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = float4(v.uv, uvb);
 				return o;
 			}

@@ -2,7 +2,7 @@
 using System.Collections;
 
 namespace SimpleFluid {
-
+    
     public class Solver : MonoBehaviour {
         public const int SOLVER_FLUID = 0;
         public const int SOLVER_ADVECT = 1;
@@ -19,11 +19,10 @@ namespace SimpleFluid {
         public const float dx = 1f;
 
         public Material solverMat;
-        public float forcePower = 1f;
-
+        public float forcePower = 0.002f;
         public float k = 0.12f;
-        public float vis = 0f;
-    	public float timeStep = 0.05f;
+        public float vis = 0.1f;
+    	public float timeStep = 0.1f;
         public float timeScale = 10f;
 
         Texture2D _initTex;
@@ -36,6 +35,7 @@ namespace SimpleFluid {
         int _height = -1;
 
         public Texture ForceTex { set { _forceTex = value; } get { return _forceTex; } }
+		public Texture FluidTex { get { return _fluidTex0; } }
         public int Width { get { return _width; } }
         public int Height { get { return _height; } }
         public float DeltaTime { get { return Time.deltaTime * timeScale; } }
@@ -55,9 +55,11 @@ namespace SimpleFluid {
             mat.SetTexture (fluidTex, _fluidTex0);
         }
 
+        #region Unity
         void OnDestroy() {
             ReleaseSolver();
         }
+        #endregion
 
         void ReleaseSolver() {
             Object.Destroy(_initTex);
