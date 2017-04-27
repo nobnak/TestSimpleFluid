@@ -1,0 +1,3 @@
+[submodule "Assets/Packages/SimpleFluid"]
+	path = Assets/Packages/SimpleFluid
+	url = git@github.com:nobnak/SimpleFluid.git
